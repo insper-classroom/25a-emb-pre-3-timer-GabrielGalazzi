@@ -8,25 +8,24 @@ const int LED_PIN_R = 4;
 volatile int flag_f_r = 0;
 volatile bool timer_active = false;
 
-struct repeating_timer timer;
 
-bool led_callback( struct repeating_timer *t){
+bool led_callback(struct repeating_timer *t){
 
     gpio_put(LED_PIN_R, !gpio_get(LED_PIN_R)); 
     return true;
 
 }
 
-void start_timer() {
+void start_timer(struct repeating_timer *t) {
     if (!timer_active) {
-        add_repeating_timer_ms(500, led_callback, NULL, &timer);
+        add_repeating_timer_ms(500, led_callback, NULL, t);
         timer_active = true;
     }
 }
 
-void stop_timer() {
+void stop_timer(struct repeating_timer *t) {
     if (timer_active) {
-        cancel_repeating_timer(&timer);
+        cancel_repeating_timer(t);
         timer_active = false;
         gpio_put(LED_PIN_R, 0);  
     }
@@ -42,6 +41,7 @@ void btn_callback(uint gpio, uint32_t events) {
 
 int main() {
 
+    struct repeating_timer timer;
 
     stdio_init_all();
     gpio_init(LED_PIN_R);
@@ -58,10 +58,10 @@ int main() {
     while (true) {
 
         if (flag_f_r) {
-            start_timer();  
+            start_timer(&timer);  
         }
         else{
-            stop_timer();
+            stop_timer(&timer);
             gpio_put(LED_PIN_R, 0);
         }
     }
