@@ -16,6 +16,7 @@ bool led_callback(struct repeating_timer *t){
 }
 
 void start_timer(struct repeating_timer *t) {
+    
 
     add_repeating_timer_ms(500, led_callback, NULL, t);
 
@@ -55,11 +56,13 @@ int main() {
     
     while (true) {
 
-        if (flag_f_r) {
-            start_timer(&timer);  
+        if (flag_f_r && timer_active == false) {
+            start_timer(&timer); 
+            timer_active = true;
         }
-        else{
+        else if (!flag_f_r && timer_active == true){
             stop_timer(&timer);
+            timer_active = false;
         }
     }
 }
